@@ -6,7 +6,6 @@ const sketch = function (p) {
     const W = 850;
     const H = 950;
 
-    // const N = 10
     const D = 50;
 
     const Vmax = 5;
@@ -292,9 +291,7 @@ const sketch = function (p) {
                     new Body(vec(513.6025403784439, 504), vec(0, 0)),
                     new Body(vec(554.6025403784439, 479), vec(0, 0)),
                     new Body(vec(602.6025403784439, 480), vec(0, 0)),
-                    // new Body(vec(424.9038105676658, 175), vec(0, 0)),
-                    // new Body(vec(577.9038105676658, 652), vec(0, 0)),
-                    // new Body(vec(576.2050807568878, 240), vec(0, 0)),
+
                 ]
                 break;
 
@@ -436,41 +433,6 @@ const sketch = function (p) {
         return r;
     }
 
-    function ddf_alt(A, b, j, t) {
-        let g = g1(A, b, j);
-
-        let l = m.multiply(
-            -1,
-            m.add(
-                m.diag(
-                    m.diag(m.map(m.multiply(j, m.transpose(j)), (e) => 1 / e))
-                ),
-                m.multiply(
-                    m.diag(
-                        m.diag(m.map(m.multiply(g, m.transpose(g)), (e) => 1 / e))
-                    ),
-                    A
-                )
-            )
-        );
-        let r = m.subtract(m.multiply(2, A), m.multiply(t, l));
-        return r;
-    }
-
-
-    function ddf_alt(A, b, j, t) {
-        let g = g1(A, b, j);
-
-        let l = m.multiply(
-            -1,
-            m.diag(
-                m.diag(m.map(m.multiply(j, m.transpose(j)), (e) => 1 / e))
-            ),
-        );
-        let r = m.subtract(m.multiply(2, A), m.multiply(t, l));
-        return r;
-    }
-
     let t_iter = 0
     let jk_iter = 0
 
@@ -547,25 +509,6 @@ const sketch = function (p) {
             let step = m.multiply(grad, -lambda)
 
             j = m.add(j, step)
-
-            // let lambda = 1
-            // let s_prev = s
-            // let j_prev = j
-
-            // while(true){
-            //     //to minimize s we should move against the gradient
-            //     let step = m.multiply(grad, -lambda)
-
-            //     j = m.add(j_prev, step)
-            //     calcS()
-            //     if(s<0){
-            //         return j
-            //     }else if(s>s_prev){
-            //         lambda /=2
-            //     }else{
-            //         break
-            //     }
-            // }
         }
     }
 
@@ -574,7 +517,6 @@ const sketch = function (p) {
         jk_iter = 0
         let t = t_start
         let jk_start = find_init_point(A, b)
-        // let jk_start = m.matrix(m.multiply(m.ones(b.size()), 40))
         let jk = jk_start;
         let t_too_small = false;
         let prevT = t;
@@ -654,27 +596,6 @@ const sketch = function (p) {
         }
     }
 
-
-    // //todo: fix the function
-    // function traverseSubgraph(node, children_by_node, visited, edges, bodies_in_group) {
-    //     visited[node] = true;
-    //     let children = children_by_node[node];
-
-    //     for (let j = 0; children && j < children.length; j++) {
-    //         let child = children[j];
-    //         edges.push({ a: node, b: child });
-    //         bodies_in_group[node] = true
-    //         bodies_in_group[child] = true
-    //     }
-
-    //     for (let j = 0; children && j < children.length; j++) {
-    //         let child = children[j];
-    //         if (!visited[child]) {
-    //             traverseSubgraph(child, children_by_node, visited, edges, bodies_in_group);
-    //         }
-    //     }
-    // }
-
     class Collision {
         constructor(a_group_id, a, b_group_id, b) {
             this.name = a.id.toString() + b.id.toString()
@@ -752,42 +673,6 @@ const sketch = function (p) {
         return groups;
     }
 
-    // function getGroupsOfCollisions(collision_receivers_by_giver) {
-    //     let groups = [];
-    //     let visited = [];
-    //     for (let i = 0; i < bodies.length; i++) {
-    //         if (!visited[i]) {
-    //             let edges = [];
-    //             let bodies_in_group = [];
-    //             traverseSubgraph(i, collision_receivers_by_giver, visited, edges, bodies_in_group);
-
-    //             if (bodies_in_group.length > 0) {
-    //                 let vacant_group_id = 0
-    //                 let group_id_by_id = []
-    //                 bodies_in_group.forEach((x, i) => {
-    //                     if (x) {
-    //                         group_id_by_id[i] = vacant_group_id
-    //                         vacant_group_id += 1
-    //                     }
-    //                 })
-    //                 let collisions = edges.map((e) => {
-    //                     return new Collision(
-    //                         group_id_by_id[e.a],
-    //                         bodies[e.a],
-    //                         group_id_by_id[e.b],
-    //                         bodies[e.b]
-    //                     )
-    //                 }
-    //                 );
-    //                 groups.push(new CollisionGroup(
-    //                     collisions,
-    //                     bodies_in_group.filter(x => x).length));
-    //             }
-    //         }
-    //     }
-    //     return groups;
-    // }
-
     let _t
     let _A
     let _b
@@ -826,7 +711,6 @@ const sketch = function (p) {
 
     function resolveCollisions() {
         let collisions = detectCollisions();
-        // let  prevCollisionsLength = collisions.length
         let choise = null
         for (let i = 0; i < collisions.length; i++) {
             let cur = collisions[i]
@@ -847,14 +731,6 @@ const sketch = function (p) {
 
             let stepback = overlap / relv;
             updateBodies(-stepback);
-            // collisions = detectCollisions();
-            // if(collisions.length != prevCollisionsLength){
-            //     drawDebug.push(()=>{
-            //         p.fill('red')
-            //         p.text('number of collisions decreased!')
-            //         pause = true
-            //     })
-            // }
 
             let groups = getGroupsOfCollisions(collisions);
             showGroupsOfCollisions(groups)
@@ -935,9 +811,6 @@ const sketch = function (p) {
         if (p.keyCode === p.RIGHT_ARROW) {
             step()
         }
-        // if (p.keyCode === p.BACKSPACE) {
-        //     p.setup()
-        // }
     }
 
     let isMovingBody = false
@@ -1095,7 +968,6 @@ const sketch = function (p) {
     let vec = (x, y) => {
         return new p5.Vector(x, y);
     };
-    // let addv = p5.Vector.add;
     let addv = function () {
         let sum = vec(0, 0)
         for (let i = 0; i < arguments.length; i++) {
